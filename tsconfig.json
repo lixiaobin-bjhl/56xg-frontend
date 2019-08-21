@@ -7,6 +7,10 @@
     "experimentalDecorators": true,
     "skipLibCheck": true
   },
+  "include": [
+    "assets/Script/**/*",
+    "typings/**/*.ts" 
+  ],
   "exclude": [
     "node_modules",
     "library",

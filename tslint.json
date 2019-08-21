@@ -1,0 +1,27 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+      "tslint-config-standard"
+    ],
+    "linterOptions": {
+      "exclude": [
+        "node_modules/**"
+      ]
+    },
+    "rules": {
+      // 结尾顿号
+      "trailing-comma": false,
+      // 方法前面的空格
+      "space-before-function-paren": false,
+      "semicolon": false, 
+      "jsdoc-format": false,
+      "max-line-length": false,
+      "quotemark": [true, "single"],
+      "indent": [true, "spaces", 4],
+      "ter-indent": 4,
+      "interface-name": false,
+      "ordered-imports": false,
+      "object-literal-sort-keys": false,
+      "no-consecutive-blank-lines": false
+    }
+  }
