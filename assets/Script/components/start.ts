@@ -1,4 +1,5 @@
 const { ccclass, property } = cc._decorator
+import Net from '../Net'
 
 @ccclass
 export default class StartClass extends cc.Component {
@@ -9,7 +10,8 @@ export default class StartClass extends cc.Component {
         this.label.string = 'welcome 卡5星'
         setTimeout(() => {
             cc.director.loadScene('login')
-        }, 2000)
+        })
+        Net.connect()
     }
 
     start() {}

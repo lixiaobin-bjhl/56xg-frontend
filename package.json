@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "socket.io-client": "^2.2.0",
     "tslint": "^5.19.0",
     "tslint-config-standard": "^8.0.1"
   },

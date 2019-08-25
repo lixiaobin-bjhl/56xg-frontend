@@ -20,6 +20,7 @@ module.exports = {
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         // 取消分号
         '@typescript-eslint/semi': ['error', 'never'],
+        "no-param-reassign": 0,
         // 'semi': ['error', 'never'],
         // 关闭强制使用"==="
         'eqeqeq': 'off',
