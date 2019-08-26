@@ -10,6 +10,21 @@ axios.interceptors.request.use(function (config) {
     return Promise.reject(error)
 })
 
+/**
+ * 添加ajax response interceptor
+ */
+axios.interceptors.response.use(function (response) {
+    let data = response.data
+    if (typeof data === 'string') {
+        data = JSON.parse(data)
+    }
+    if (data.code === 0 || data.status === 0) {
+        return data
+    } else {
+        return Promise.reject(data)
+    }
+})
+
 export default class Utils extends cc.Component {
     static addClickEvent(node, target, component, handler) {
         let eventHandler = new cc.Component.EventHandler()
