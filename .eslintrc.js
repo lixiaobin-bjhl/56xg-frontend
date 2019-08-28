@@ -36,6 +36,7 @@ module.exports = {
         ],
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-use-before-define': 'off',
+        '@typescript-eslint/prefer-for-of': 'off',
         '@typescript-eslint/camelcase': ['off', {properties: 'always'}],
         '@typescript-eslint/no-unused-vars': ['error', {
             'vars': 'all',

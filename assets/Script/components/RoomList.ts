@@ -1,6 +1,6 @@
 const { ccclass } = cc._decorator
 
-import { roomList } from '../../service/room'
+import { roomList, join } from '../../service/room'
 
 @ccclass
 export default class RoomList extends cc.Component {
@@ -52,6 +52,12 @@ export default class RoomList extends cc.Component {
      * 选择房间
      */
     selectRoom(event) {
-        console.log(event.currentTarget.rid)
+        let roomId = event.currentTarget.rid
+        join({
+            roomId
+        })
+            .then(() => {
+                console.log('加入房间成功')
+            })
     }
 }

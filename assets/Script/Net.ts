@@ -5,9 +5,7 @@ export default class NetCtrl extends cc.Component {
     static socket: Object
     static connect() {
         this.socket = io('http://127.0.0.1:7001', {
-            query: {
-                name: 'xiaobin'
-            },
+            query: {},
             transports: ['websocket']
         })
         this.socket.on('connect', () => {

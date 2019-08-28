@@ -1,5 +1,4 @@
 const { ccclass, property } = cc._decorator
-import Net from '../Net'
 
 @ccclass
 export default class StartClass extends cc.Component {

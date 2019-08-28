@@ -4,7 +4,7 @@ let urlPrefix = 'http://127.0.0.1:7001'
 
 axios.interceptors.request.use(function (config) {
     config.url = urlPrefix + config.url
-    config.headers['X-Requested-With'] = 'XMLHttpRequest'
+    config.withCredentials = true
     return config
 }, function (error) {
     return Promise.reject(error)

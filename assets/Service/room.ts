@@ -19,3 +19,14 @@ export function roomList() {
 export function add(params) {
     return axios.post('/room/add.json', params)
 }
+
+/**
+ * 加入房间
+ *
+ * @param {number} roomid 房间id
+ *
+ * @return Promise
+ */
+export function join(params) {
+    return axios.post('/room/join.json', params)
+}
