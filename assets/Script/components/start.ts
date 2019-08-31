@@ -10,9 +10,6 @@ export default class StartClass extends cc.Component {
         setTimeout(() => {
             cc.director.loadScene('login')
         })
-        Net.connect()
     }
-
     start() {}
-    // update (dt) {}
 }

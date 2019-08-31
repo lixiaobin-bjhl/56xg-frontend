@@ -4,6 +4,7 @@ import Utils from '../Utils'
 import Net from '../Net'
 import urlParse from '../functions/urlParse'
 import { login, info } from '../../Service/common'
+import { setUser } from '../User'
 
 @ccclass
 export default class Login extends cc.Component {
@@ -15,7 +16,10 @@ export default class Login extends cc.Component {
     getUserInfo() {
         info()
             .then((res) => {
-                console.log(res.data)
+                if (res.data) {
+                    setUser(res.data)
+                    cc.director.loadScene('hall')
+                }
             })
     }
     handleLogin() {
