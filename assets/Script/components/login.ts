@@ -16,9 +16,14 @@ export default class Login extends cc.Component {
     getUserInfo() {
         info()
             .then((res) => {
-                if (res.data) {
-                    setUser(res.data)
-                    cc.director.loadScene('hall')
+                let data = res.data
+                if (data) {
+                    setUser(data)
+                    if (data.gameNumber) {
+                        cc.director.loadScene('home')
+                    } else if (data.id) {
+                        cc.director.loadScene('hall')
+                    }
                 }
             })
     }
@@ -26,7 +31,8 @@ export default class Login extends cc.Component {
         login({
             user: urlParse()['user'] || 'xiaobin'
         })
-            .then(() => {
+            .then((res) => {
+                setUser(res.data)
                 Net.connect()
                 cc.director.loadScene('hall')
             })

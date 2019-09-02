@@ -1,7 +1,7 @@
 const { ccclass } = cc._decorator
 
-import { roomList, join } from '../../service/room'
-import { getUser } from '../User'
+import { roomList, join } from '../../Service/room'
+import { getUser, setUserRoomId } from '../User'
 
 @ccclass
 export default class RoomList extends cc.Component {
@@ -66,7 +66,11 @@ export default class RoomList extends cc.Component {
         join({
             roomId
         })
-            .then(() => {
+            .then((res) => {
+                let data = res.data
+                if (data.roomId) {
+                    setUserRoomId(data.roomId)
+                }
                 console.log('加入房间成功')
             })
     }

@@ -2,10 +2,10 @@ const { ccclass } = cc._decorator
 
 import Utils from '../Utils'
 import { start } from '../../Service/game'
-import { getUser, setUserRoomId } from '../User'
+import { getUser, setUserGameNumber } from '../User'
 
 @ccclass
-export default class NewClass extends cc.Component {
+export default class HallClass extends cc.Component {
     createRoomDialog = null
     onLoad() {
         let user = getUser()
@@ -18,7 +18,6 @@ export default class NewClass extends cc.Component {
         this.addComponent('AddRoom')
         // this.addComponent('RoomList')
         this.bindEvent()
-
     }
 
     bindEvent() {
@@ -48,15 +47,19 @@ export default class NewClass extends cc.Component {
     /**
      * 开始游戏
      */
-    startGame(roomId) {
-        start({
-            roomId: roomId
-        })
-            .then((res) => {
-                let data = res.data
-                if (data.roomId) {
-                    setUserRoomId(data.roomId)
-                }
-            })
+    startGame() {
+        let user = getUser()
+        if (user.roomId) {
+            start()
+                .then((res) => {
+                    let data = res.data
+                    if (data) {
+                        setUserGameNumber(data.number)
+                        cc.director.loadScene('home')
+                    }
+                })
+        } else {
+            console.log('你还没有选择房间')
+        }
     }
 }
