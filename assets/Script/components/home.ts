@@ -1,24 +1,16 @@
 const { ccclass } = cc._decorator
 
-import { deal } from '../../Service/game'
-import GameMgr from '../../classes/GameMgr'
 
 @ccclass
-export default class GameClass extends cc.Component {
-    gameMgr: null
+export default class HomeClass extends cc.Component {
+
+
     onLoad() {
-        deal()
-            .then((res) => {
-                let data = res.data
-                if (data) {
-                    let gameMgr: GameMgr = new GameMgr({
-                        gameInfo: data
-                    })
-                    this.gameMgr = gameMgr
-                    gameMgr.initMyMahjongs()
-                } else {
-                    cc.director.loadScene('hall')
-                }
-            })
+        // let user = getUser()
+        // if (!user) {
+        //     cc.director.loadScene('login')
+        // }
+        // this.initView()
+        // this.addComponent('MjMgr')
     }
 }
