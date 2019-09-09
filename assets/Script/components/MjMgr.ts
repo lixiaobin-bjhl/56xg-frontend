@@ -24,8 +24,14 @@ export default class MjMgr extends cc.Component {
     mahjongSprites
     // 游戏信息
     gameInfo
+    // 当前出牌人
+    turn = 0
+    // 当前出的牌
+    chupai
+    // 选中的麻将
+    selectedMJ = null
     // 坐次
-    sides: ['my', 'right', 'left']
+    sides = ['my', 'right', 'left']
     foldPres = ['B_', 'R_', 'L_']
 
     async onLoad() {
@@ -35,6 +41,7 @@ export default class MjMgr extends cc.Component {
             return
         }
         this.initView()
+        this.initMahjong()
         await this.fetchGameInfo()
         this.gameBegin()
     }
@@ -53,11 +60,13 @@ export default class MjMgr extends cc.Component {
         let gameChild = this.node.getChildByName('game')
         let my = gameChild.getChildByName('my')
         let myholds = my.getChildByName('holds')
+        this.chupai = gameChild.getChildByName('chupai')
+        this.chupai.active = false
         for (let i = 0; i < myholds.children.length; ++i) {
             let sprite: cc.Sprite = myholds.children[i].getComponent(cc.Sprite)
             this.myMj.push(sprite)
             sprite.spriteFrame = null
-            // this.initDragStuffs(sprite.node)
+            this.bindMyHoldsEvent(sprite.node)
         }
     }
     initMahjong() {
@@ -92,13 +101,118 @@ export default class MjMgr extends cc.Component {
             gameInfo.gameUsers[gameInfo.room.seats[i].userId].seatindex = i
         }
         for (let key in gameInfo.gameUsers) {
+            // 把自己的手牌展示出来
             if (this.myIndex == gameInfo.gameUsers[key].seatindex) {
-                this.initMahjong()
+                this.initMyMahjongs()
             } else {
-                this.initOtherMahjongs(gameInfo.gameUsers[key])
+                // this.initOtherMahjongs(gameInfo.gameUsers[key])
             }
         }
+    }
+    /**
+     * 绑定我的手牌事件
+     */
+    bindMyHoldsEvent(node) {
+        node.on(cc.Node.EventType.TOUCH_START, function (event) {
+            console.log('cc.Node.EventType.TOUCH_START')
+            // 轮到我自己出牌时，才响应
+            if (this.turn != this.myIndex) {
+                return
+            }
+            node.interactable = node.getComponent(cc.Button).interactable
+            if (!node.interactable) {
+                return
+            }
+            node.opacity = 255
+            this.chupai.active = false
+            this.chupai.getComponent(cc.Sprite).spriteFrame = node.getComponent(cc.Sprite).spriteFrame
+            this.chupai.x = event.getLocationX() - this.node.width / 2
+            this.chupai.y = event.getLocationY() - this.node.height / 2
+        }.bind(this))
 
+        node.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
+            console.log('cc.Node.EventType.TOUCH_MOVE')
+            if (this.turn != this.myIndex) {
+                return
+            }
+            if (!node.interactable) {
+                return
+            }
+            if (Math.abs(event.getDeltaX()) + Math.abs(event.getDeltaY()) < 0.5) {
+                return
+            }
+            this.chupai.active = true
+            node.opacity = 150
+            this.chupai.opacity = 255
+            this.chupai.scaleX = 1
+            this.chupai.scaleY = 1
+            // this.chupai.x = event.getLocationX() - this.width / 2
+            // this.chupai.y = event.getLocationY() - this.height / 2
+            node.y = 0
+        }.bind(this))
+
+        node.on(cc.Node.EventType.TOUCH_END, function (event) {
+            if (this.turn != this.myIndex) {
+                return
+            }
+            if (!node.interactable) {
+                return
+            }
+            console.log('cc.Node.EventType.TOUCH_END')
+            this.chupai.active = false
+            node.opacity = 255
+            if (event.getLocationY() >= 200) {
+                this.shoot(node.mjId)
+            }
+        }.bind(this))
+
+        node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
+            if (this.turn != this.myIndex) {
+                return
+            }
+            if (!node.interactable) {
+                return
+            }
+            console.log('cc.Node.EventType.TOUCH_CANCEL')
+            this.chupai.active = false
+            node.opacity = 255
+            if (event.getLocationY() >= 200) {
+                this.shoot(node.mjId)
+            } else if (event.getLocationY() >= 150) {
+                // this._huadongtishi.active = true;
+                // this._huadongtishi.getComponent(cc.Animation).play('huadongtishi');
+            }
+        }.bind(this))
+    }
+
+    // 出牌
+    shoot(mjId) {
+        if (mjId == null) {
+            return
+        }
+        console.log('shoot')
+    }
+    onMJClicked(event) {
+        if (this.turn != this.myIndex) {
+            return
+        }
+        for (let i = 0; i < this.myMj.length; ++i) {
+            if (event.target == this.myMj[i].node) {
+                // 如果是再次点击，则出牌
+                if (event.target == this.selectedMJ) {
+                    this.shoot(this.selectedMJ.mjId)
+                    this.selectedMJ.y = 0
+                    this.selectedMJ = null
+                    return
+                }
+                if (this.selectedMJ != null) {
+                    this.selectedMJ.y = 0
+                }
+                event.target.y = 15
+                this.selectedMJ = event.target
+                return
+            }
+        }
     }
     /**
      * 初始化我的手牌
@@ -122,17 +236,19 @@ export default class MjMgr extends cc.Component {
             return
         }
         let side = this.getSide(localIndex)
+        let game = this.node.getChildByName('game')
+        let sideRoot = game.getChildByName(side)
+        let sideHolds = sideRoot.getChildByName('holds')
         let pre = this.getFoldPre(localIndex)
         let holds = this.sort(seat.holds)
+
         if (holds != null && holds.length > 0) {
             for (let i = 0; i < holds.length; ++i) {
-                let idx = this.getMJIndex(side, i + num)
-                let sprite = sideHolds.children[idx].getComponent(cc.Sprite)
+                let sprite = sideHolds.children[i].getComponent(cc.Sprite)
                 sprite.node.active = true
-                sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID(pre, holds[i])
+                sprite.spriteFrame = this.getSpriteFrameByMJId(pre, holds[i])
             }
         }
-        console.log(localIndex, seat)
     }
     getSide(localIndex) {
         return this.sides[localIndex]
@@ -165,7 +281,6 @@ export default class MjMgr extends cc.Component {
         })
         return holds
     }
-
     getMahjongSpriteById(id) {
         return this.mahjongSprites[id]
     }

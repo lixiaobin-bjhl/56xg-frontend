@@ -19,6 +19,7 @@ export default class Login extends cc.Component {
                 let data = res.data
                 if (data) {
                     setUser(data)
+                    Net.connect()
                     if (data.gameNumber) {
                         cc.director.loadScene('home')
                     } else if (data.id) {
