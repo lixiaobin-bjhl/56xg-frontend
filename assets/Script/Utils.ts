@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 let urlPrefix = 'http://127.0.0.1:7001'
+import { Toast } from './Toast'
 
 axios.interceptors.request.use(function (config) {
     config.url = urlPrefix + config.url
@@ -21,6 +22,7 @@ axios.interceptors.response.use(function (response) {
     if (data.code === 0 || data.status === 0) {
         return data
     } else {
+        Toast.ShowText(data.msg)
         return Promise.reject(data)
     }
 })

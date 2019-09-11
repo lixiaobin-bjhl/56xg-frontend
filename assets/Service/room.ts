@@ -30,3 +30,6 @@ export function add(params) {
 export function join(params) {
     return axios.post('/room/join.json', params)
 }
+export function detail(params) {
+    return axios.post('/room/detail.json', params)
+}

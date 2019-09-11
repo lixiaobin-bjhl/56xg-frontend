@@ -22,6 +22,8 @@ export default class Login extends cc.Component {
                     Net.connect()
                     if (data.gameNumber) {
                         cc.director.loadScene('home')
+                    } else if (data.roomId) {
+                        cc.director.loadScene('groom')
                     } else if (data.id) {
                         cc.director.loadScene('hall')
                     }

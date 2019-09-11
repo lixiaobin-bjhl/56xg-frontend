@@ -26,7 +26,7 @@ module.exports = {
         'eqeqeq': 'off',
         // 允许使用for-in
         'guard-for-in': 'off',
-        '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'no-public' }],
+        '@typescript-eslint/explicit-member-accessibility': ['error', 'never'],
         '@typescript-eslint/explicit-function-return-type': [
             'off', 
             {
@@ -36,6 +36,7 @@ module.exports = {
         ],
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-use-before-define': 'off',
+        '@typescript-eslint/no-this-alias': 'off',
         '@typescript-eslint/prefer-for-of': 'off',
         '@typescript-eslint/camelcase': ['off', {properties: 'always'}],
         '@typescript-eslint/no-unused-vars': ['error', {

@@ -1,12 +1,19 @@
+
 const { ccclass, property } = cc._decorator
+import Net from '../Net'
+import { getUser } from '../User'
+import { join } from '../../Service/room'
 
 @ccclass
 export default class JoinGameInput extends cc.Component {
     @property([cc.Label])
-    nums: [cc.Label] = []
+    nums = []
     inputIndex = 0
     onLoad() {
-        this.onResetClicked()
+        let user = getUser()
+        if (user) {
+            this.onResetClicked()
+        }
     }
     onInput(num) {
         if (this.inputIndex >= this.nums.length) {
@@ -20,20 +27,17 @@ export default class JoinGameInput extends cc.Component {
         }
     }
     onInputFinished(roomId) {
-        console.log(roomId)
-        // cc.vv.userMgr.enterRoom(roomId, function(ret) {
-        //     if (ret.errcode == 0) {
-        //         this.node.active = false
-        //     }
-        //     else {
-        //         let content = '房间[' + roomId + ']不存在，请重新输入!'
-        //         if (ret.errcode == 4) {
-        //             content = '房间[' + roomId + ']已满!'
-        //         }
-        //         cc.vv.alert.show('提示', content)
-        //         this.onResetClicked()
-        //     }
-        // }.bind(this))
+        join({
+            roomId
+        })
+            .then((res) => {
+                let self = this
+                Net.socket.emit('join-room', {
+                    roomId: roomId
+                }, function() {
+                    self.onCloseClicked()
+                })
+            })
     }
     parseRoomId() {
         let str = ''
