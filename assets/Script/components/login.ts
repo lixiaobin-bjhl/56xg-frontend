@@ -5,6 +5,7 @@ import Net from '../Net'
 import urlParse from '../functions/urlParse'
 import { login, info } from '../../Service/common'
 import { setUser } from '../User'
+import { detail } from '../../Service/room'
 
 @ccclass
 export default class Login extends cc.Component {
@@ -20,10 +21,18 @@ export default class Login extends cc.Component {
                 if (data) {
                     setUser(data)
                     Net.connect()
-                    if (data.gameNumber) {
-                        cc.director.loadScene('home')
-                    } else if (data.roomId) {
-                        cc.director.loadScene('groom')
+                    if (data.roomId) {
+                        detail({
+                            roomId: data.roomId
+                        })
+                            .then((res) => {
+                                let data = res.data
+                                if (data.game) {
+                                    cc.director.loadScene('home')
+                                } else {
+                                    cc.director.loadScene('groom')
+                                }
+                            })
                     } else if (data.id) {
                         cc.director.loadScene('hall')
                     }

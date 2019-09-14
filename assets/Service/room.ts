@@ -33,3 +33,10 @@ export function join(params) {
 export function detail(params) {
     return axios.post('/room/detail.json', params)
 }
+
+/**
+ * 离开房间
+ */
+export function leave() {
+    return axios.post('/room/leave.json', {})
+}

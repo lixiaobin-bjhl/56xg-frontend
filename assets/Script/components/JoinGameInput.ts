@@ -1,7 +1,7 @@
 
 const { ccclass, property } = cc._decorator
 import Net from '../Net'
-import { getUser } from '../User'
+import { getUser, setUserRoomId } from '../User'
 import { join } from '../../Service/room'
 
 @ccclass
@@ -32,9 +32,11 @@ export default class JoinGameInput extends cc.Component {
         })
             .then((res) => {
                 let self = this
+                setUserRoomId(roomId)
                 Net.socket.emit('join-room', {
                     roomId: roomId
                 }, function() {
+                    cc.director.loadScene('groom')
                     self.onCloseClicked()
                 })
             })
