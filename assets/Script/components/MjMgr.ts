@@ -1,6 +1,7 @@
 const { ccclass, property } = cc._decorator
 
 import { deal } from '../../Service/game'
+import { detail } from '../../Service/room'
 import { getUser } from '../User'
 
 @ccclass
@@ -22,6 +23,8 @@ export default class MjMgr extends cc.Component {
     myIndex
     // 麻将的图片
     mahjongSprites
+    // 房间信息
+    room
     // 游戏信息
     gameInfo
     // 当前出牌人
@@ -42,18 +45,31 @@ export default class MjMgr extends cc.Component {
         }
         this.initView()
         this.initMahjong()
-        await this.fetchGameInfo()
+        await this.dealPai()
         this.gameBegin()
     }
-    fetchGameInfo() {
+    async dealPai() {
         return deal()
             .then((res) => {
                 let data = res.data
                 if (data) {
-                    this.gameInfo = data
+                    this.room = data
+                    this.gameInfo = data.game
                 } else {
                     cc.director.loadScene('hall')
                 }
+            })
+    }
+    async fetchRoomDetail() {
+        let user = getUser()
+        let roomId = user.roomId
+        return detail({
+            roomId
+        })
+            .then((res) => {
+                let data =  res.data
+                this.room = data
+                this.gameInfo = data.game
             })
     }
     initView() {
@@ -94,11 +110,11 @@ export default class MjMgr extends cc.Component {
         let gameInfo = this.gameInfo
         let user = getUser()
         // 找到自己坐位和其它玩家的坐位号
-        for (let i = 0; i < gameInfo.room.seats.length; i++) {
-            if (gameInfo.room.seats[i].userId === user.id) {
+        for (let i = 0; i < this.room.seats.length; i++) {
+            if (this.room.seats[i].userId === user.id) {
                 this.myIndex = i
             }
-            gameInfo.gameUsers[gameInfo.room.seats[i].userId].seatindex = i
+            gameInfo.gameUsers[this.room.seats[i].userId].seatindex = i
         }
         for (let key in gameInfo.gameUsers) {
             // 把自己的手牌展示出来
