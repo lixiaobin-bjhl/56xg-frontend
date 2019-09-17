@@ -1,8 +1,8 @@
 
 import axios from 'axios'
 
-export function start() {
-    return axios.post('/game/start.json', {})
+export function start(params) {
+    return axios.post('/game/start.json', params)
 }
 
 export function deal() {

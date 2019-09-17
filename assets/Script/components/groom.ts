@@ -23,11 +23,20 @@ export default class HallClass extends cc.Component {
         let user = getUser()
         let roomId = user.roomId
         detail({
-            roomId
+            roomId,
+            checkEnoughUser: true
         })
             .then((res) => {
                 let room = res.data
-
+                // 人满了，开始游戏
+                if (room.seats.length >= 3) {
+                    start({
+                        roomId: roomId
+                    })
+                        .then(() => {
+                            cc.director.loadScene('home')
+                        })
+                }
                 let user1 =  room.seats[0]
                 let seat1 = cc.find('Canvas/seat1')
                 if (user1.userId) {
@@ -98,25 +107,5 @@ export default class HallClass extends cc.Component {
                 setUserRoomId(null)
                 cc.director.loadScene('hall')
             })
-    }
-
-    /**
-     * 开始游戏
-     */
-    startGame() {
-        console.log('start game')
-        // let user = getUser()
-        // if (user.roomId) {
-        //     start()
-        //         .then((res) => {
-        //             let data = res.data
-        //             if (data) {
-        //                 setUserGameNumber(data.number)
-        //                 cc.director.loadScene('home')
-        //             }
-        //         })
-        // } else {
-        //     console.log('你还没有选择房间')
-        // }
     }
 }

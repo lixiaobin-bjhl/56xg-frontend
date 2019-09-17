@@ -3,6 +3,7 @@ const { ccclass, property } = cc._decorator
 import { deal } from '../../Service/game'
 import { detail } from '../../Service/room'
 import { getUser } from '../User'
+import Net from '../Net'
 
 @ccclass
 export default class MjMgr extends cc.Component {
@@ -47,6 +48,27 @@ export default class MjMgr extends cc.Component {
         this.initMahjong()
         await this.dealPai()
         this.gameBegin()
+        this.bindEvent()
+    }
+    bindEvent() {
+        Net.init(this.node)
+        let user = getUser()
+        this.node.on('message', (res) => {
+            let type = res.type
+            let gameUser = res.data.gameUser
+            console.log('get a message from home', res)
+            // 有人出牌了
+            if (type === 'chupai') {
+                // 更新一下出牌人的手牌
+                this.gameInfo.gameUsers[gameUser.userId] = gameUser
+                // 如果是自己打的牌，刷新一下手牌
+                if (res.from.id === user.id) {
+                    this.initMyMahjongs()
+                } else {
+                    this.initOtherMahjongs(gameUser)
+                }
+            }
+        })
     }
     async dealPai() {
         return deal()
@@ -206,7 +228,9 @@ export default class MjMgr extends cc.Component {
         if (mjId == null) {
             return
         }
-        console.log('shoot')
+        Net.socket.emit('chupai', {
+            pai: mjId
+        })
     }
     onMJClicked(event) {
         if (this.turn != this.myIndex) {
