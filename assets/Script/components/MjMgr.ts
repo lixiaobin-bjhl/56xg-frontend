@@ -262,6 +262,7 @@ export default class MjMgr extends cc.Component {
         let user = getUser()
         let my = gameInfo.gameUsers[user.id]
         let holds = this.sort(my.holds)
+
         for (let i = 0; i < holds.length; ++i) {
             let mjid = holds[i]
             let sprite = this.myMj[i]
@@ -269,6 +270,13 @@ export default class MjMgr extends cc.Component {
             sprite.node.y = 0
             this.setSpriteFrameByMJId('M_', sprite, mjid)
         }
+
+        for (let i = holds.length; i < this.myMj.length; ++i) {
+            let sprite = this.myMj[i]
+            sprite.node.mjId = null
+            sprite.node.active = false
+        }
+
     }
     initOtherMahjongs(seat) {
         let localIndex = this.getLocalIndex(seat.seatindex)
