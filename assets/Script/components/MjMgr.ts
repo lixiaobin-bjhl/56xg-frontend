@@ -1,7 +1,6 @@
 const { ccclass, property } = cc._decorator
 
 import { deal } from '../../Service/game'
-import { detail } from '../../Service/room'
 import { getUser } from '../User'
 import Net from '../Net'
 
@@ -55,18 +54,25 @@ export default class MjMgr extends cc.Component {
         let user = getUser()
         this.node.on('message', (res) => {
             let type = res.type
-            let gameUser = res.data.gameUser
+            let data = res.data
             console.log('get a message from home', res)
             // 有人出牌了
             if (type === 'chupai') {
+                let game = data.game
+                let gameUser = data.gameUser
+                // 更新一下麻将信息
+                this.gameInfo = game
                 // 更新一下出牌人的手牌
-                this.gameInfo.gameUsers[gameUser.userId] = gameUser
+                // this.gameInfo.gameUsers[gameUser.userId] = gameUser
                 // 如果是自己打的牌，刷新一下手牌
                 if (res.from.id === user.id) {
                     this.initMyMahjongs()
                 } else {
                     this.initOtherMahjongs(gameUser)
                 }
+            }
+            if (type === 'mopai') {
+                console.log('摸了一张牌', data)
             }
         })
     }
@@ -80,18 +86,6 @@ export default class MjMgr extends cc.Component {
                 } else {
                     cc.director.loadScene('hall')
                 }
-            })
-    }
-    async fetchRoomDetail() {
-        let user = getUser()
-        let roomId = user.roomId
-        return detail({
-            roomId
-        })
-            .then((res) => {
-                let data =  res.data
-                this.room = data
-                this.gameInfo = data.game
             })
     }
     initView() {
@@ -136,11 +130,11 @@ export default class MjMgr extends cc.Component {
             if (this.room.seats[i].userId === user.id) {
                 this.myIndex = i
             }
-            gameInfo.gameUsers[this.room.seats[i].userId].seatindex = i
+            gameInfo.gameUsers[this.room.seats[i].userId].seatIndex = i
         }
         for (let key in gameInfo.gameUsers) {
             // 把自己的手牌展示出来
-            if (this.myIndex == gameInfo.gameUsers[key].seatindex) {
+            if (this.myIndex == gameInfo.gameUsers[key].seatIndex) {
                 this.initMyMahjongs()
             } else {
                 // this.initOtherMahjongs(gameInfo.gameUsers[key])
@@ -152,11 +146,11 @@ export default class MjMgr extends cc.Component {
      */
     bindMyHoldsEvent(node) {
         node.on(cc.Node.EventType.TOUCH_START, function (event) {
-            console.log('cc.Node.EventType.TOUCH_START')
             // 轮到我自己出牌时，才响应
-            if (this.turn != this.myIndex) {
+            if (this.gameInfo.turn != this.myIndex) {
                 return
             }
+            console.log('cc.Node.EventType.TOUCH_START')
             node.interactable = node.getComponent(cc.Button).interactable
             if (!node.interactable) {
                 return
@@ -170,7 +164,7 @@ export default class MjMgr extends cc.Component {
 
         node.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
             console.log('cc.Node.EventType.TOUCH_MOVE')
-            if (this.turn != this.myIndex) {
+            if (this.gameInfo.turn != this.myIndex) {
                 return
             }
             if (!node.interactable) {
@@ -190,7 +184,7 @@ export default class MjMgr extends cc.Component {
         }.bind(this))
 
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
-            if (this.turn != this.myIndex) {
+            if (this.gameInfo.turn != this.myIndex) {
                 return
             }
             if (!node.interactable) {
@@ -205,7 +199,7 @@ export default class MjMgr extends cc.Component {
         }.bind(this))
 
         node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
-            if (this.turn != this.myIndex) {
+            if (this.gameInfo.turn != this.myIndex) {
                 return
             }
             if (!node.interactable) {
@@ -233,7 +227,7 @@ export default class MjMgr extends cc.Component {
         })
     }
     onMJClicked(event) {
-        if (this.turn != this.myIndex) {
+        if (this.gameInfo.turn != this.myIndex) {
             return
         }
         for (let i = 0; i < this.myMj.length; ++i) {
@@ -279,7 +273,7 @@ export default class MjMgr extends cc.Component {
 
     }
     initOtherMahjongs(seat) {
-        let localIndex = this.getLocalIndex(seat.seatindex)
+        let localIndex = this.getLocalIndex(seat.seatIndex)
         if (localIndex == 0) {
             return
         }

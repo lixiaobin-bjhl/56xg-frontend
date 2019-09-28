@@ -13,7 +13,7 @@ export default class NetCtrl extends cc.Component {
         this.socket = io('http://127.0.0.1:7001', {
             query: {
                 uid: user.id,
-                roomId: user.roomId || null
+                roomId: user.roomId || ''
             },
             transports: ['websocket']
         })
